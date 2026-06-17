@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>株式会社エムズプランニング | 土浦から、色を刷る。</title>
+<meta name="description" content="茨城県土浦市の株式会社エムズプランニング。広告・印刷デザイン、モンスターラウンジ（脱毛・もみほぐし・痩身エステ・日焼け・酸素ルーム）、モンスターガレージ（バイク・トライク・自動車販売）。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0D0B12;
+  --ink:#F4F1EA;
+  --sub:rgba(244,241,234,.62);
+  --line:rgba(244,241,234,.16);
+  --c-blue:#4FB3E8;
+  --c-green:#2EAF7D;
+  --c-pink:#E85D8A;
+  --c-sun:#F08C2E;
+  --c-cyan:#5CC8D8;
+  --c-red:#D8402E;
+  --c-gold:#C9A24B;
+  --c-navy:#16243E;
+  --serif:"Shippori Mincho B1","Hiragino Mincho ProN",serif;
+  --sans:"Zen Kaku Gothic New","Noto Sans JP","Yu Gothic","Hiragino Sans",sans-serif;
+  --en:"Inter","Zen Kaku Gothic New",sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:auto}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+body{
+  font-family:var(--sans);
+  background:var(--bg);
+  color:var(--ink);
+  transition:background-color 1s cubic-bezier(.4,0,.2,1),color 1s cubic-bezier(.4,0,.2,1);
+  overflow-x:hidden;
+  line-height:1.85;
+}
+::selection{background:var(--c-red);color:#fff}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+
+/* ===== fixed UI ===== */
+#paint-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+.site-head{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:22px clamp(20px,4vw,56px);
+  mix-blend-mode:difference;color:#fff;
+}
+.site-head .logo{font-family:var(--en);font-weight:800;letter-spacing:.22em;font-size:13px}
+.site-head .logo small{display:block;font-family:var(--sans);font-weight:500;letter-spacing:.3em;font-size:10px;opacity:.7;margin-top:2px}
+.site-head .tel{font-family:var(--en);font-weight:600;font-size:13px;letter-spacing:.08em;border:1px solid rgba(255,255,255,.5);border-radius:999px;padding:8px 18px;transition:opacity .3s}
+.site-head .tel:hover{opacity:.6}
+.chapter-rail{
+  position:fixed;right:clamp(12px,2.5vw,36px);top:50%;transform:translateY(-50%);
+  z-index:40;display:flex;flex-direction:column;gap:18px;mix-blend-mode:difference;
+}
+.chapter-rail a{display:flex;align-items:center;gap:10px;color:#fff;opacity:.35;transition:opacity .4s;font-family:var(--en);font-size:10px;letter-spacing:.2em}
+.chapter-rail a span.dot{width:6px;height:6px;border-radius:50%;background:#fff;transition:transform .4s}
+.chapter-rail a.active{opacity:1}
+.chapter-rail a.active span.dot{transform:scale(1.8)}
+.chapter-rail a b{display:none;font-weight:600}
+@media(min-width:1100px){.chapter-rail a b{display:inline}}
+
+/* ===== layout primitives ===== */
+.wrap{position:relative;z-index:2;max-width:1240px;margin:0 auto;padding:0 clamp(20px,5vw,64px)}
+section.scene{position:relative;z-index:2}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:14px;
+  font-family:var(--en);font-size:11px;font-weight:600;letter-spacing:.34em;
+  color:var(--accent,var(--c-red));text-transform:uppercase;margin-bottom:26px;
+}
+.eyebrow::before{content:"";width:42px;height:1px;background:currentColor}
+.chapter-no{
+  font-family:var(--serif);font-size:clamp(64px,9vw,130px);font-weight:800;
+  line-height:1;color:transparent;-webkit-text-stroke:1px var(--sub);opacity:.5;
+  position:absolute;top:-30px;left:clamp(20px,5vw,64px);user-select:none;
+}
+h2.scene-title{
+  font-family:var(--serif);font-weight:800;
+  font-size:clamp(34px,5.4vw,72px);line-height:1.25;letter-spacing:.04em;
+  margin-bottom:28px;
+}
+h2.scene-title .line{display:block;overflow:hidden}
+h2.scene-title .line>span{display:inline-block;transform:translateY(110%)}
+.lede{max-width:34em;color:var(--sub);font-size:clamp(14px,1.4vw,16.5px);font-weight:500}
+.lede strong{color:var(--ink);font-weight:700}
+
+/* ===== hero ===== */
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:2}
+.hero .wrap{width:100%}
+.hero-kicker{font-family:var(--en);letter-spacing:.4em;font-size:clamp(10px,1.2vw,13px);color:var(--sub);margin-bottom:30px;font-weight:600}
+.hero h1{
+  font-family:var(--serif);font-weight:800;line-height:1.18;letter-spacing:.03em;
+  font-size:clamp(44px,8.4vw,120px);
+}
+.hero h1 .row{display:block;overflow:hidden}
+.hero h1 .row>span{display:inline-block;transform:translateY(110%)}
+.hero h1 em{font-style:normal;color:var(--c-red);position:relative}
+.hero-sub{margin-top:34px;display:flex;flex-wrap:wrap;gap:10px 26px;color:var(--sub);font-size:clamp(12px,1.3vw,14px);font-weight:500;letter-spacing:.06em}
+.hero-sub i{font-style:normal;display:flex;align-items:center;gap:8px}
+.hero-sub i::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--dotc,#fff)}
+.scroll-cue{
+  position:absolute;bottom:34px;left:clamp(20px,5vw,64px);
+  font-family:var(--en);font-size:10px;letter-spacing:.3em;color:var(--sub);
+  display:flex;align-items:center;gap:14px;
+}
+.scroll-cue::after{content:"";width:1px;height:48px;background:linear-gradient(var(--ink),transparent);animation:cue 1.8s ease-in-out infinite;transform-origin:top}
+@keyframes cue{0%{transform:scaleY(0)}45%{transform:scaleY(1)}100%{transform:scaleY(1);opacity:0}}
+
+/* ===== prologue ===== */
+.prologue{padding:clamp(120px,18vh,220px) 0}
+.biz-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:64px}
+.biz-card{background:var(--bg);transition:background-color 1s;padding:clamp(26px,3vw,44px);position:relative;min-height:260px;display:flex;flex-direction:column;justify-content:space-between}
+.biz-card .num{font-family:var(--en);font-size:11px;letter-spacing:.25em;color:var(--sub)}
+.biz-card h3{font-family:var(--serif);font-size:clamp(19px,1.9vw,24px);font-weight:700;margin:14px 0 10px;line-height:1.5}
+.biz-card p{font-size:13px;color:var(--sub);line-height:1.9}
+.biz-card .bar{position:absolute;left:0;top:0;width:100%;height:3px;background:var(--accent);transform:scaleX(0);transform-origin:left}
+@media(max-width:820px){.biz-grid{grid-template-columns:1fr}}
+
+/* ===== chapter common ===== */
+.chapter{padding:clamp(130px,20vh,240px) 0;position:relative}
+.split{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(36px,6vw,90px);align-items:center}
+@media(max-width:920px){.split{grid-template-columns:1fr}}
+.photo-slot{
+  position:relative;border-radius:6px;overflow:hidden;
+  aspect-ratio:4/3;background:var(--ph-bg,linear-gradient(135deg,#1c2740,#0d1322));
+  box-shadow:0 30px 80px rgba(0,0,0,.35);
+  isolation:isolate;
+}
+.photo-slot::after{
+  content:attr(data-label);
+  position:absolute;inset:auto 0 0 0;padding:10px 16px;
+  font-size:10px;letter-spacing:.18em;color:rgba(255,255,255,.65);
+  background:linear-gradient(transparent,rgba(0,0,0,.55));z-index:3;
+}
+.photo-slot .art{position:absolute;inset:0;z-index:1}
+.photo-slot img.ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2}
+.works-row{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:60px}
+.works-row figure{border:1px solid var(--line);border-radius:6px;overflow:hidden;background:rgba(0,0,0,.04)}
+.works-row img{width:100%;aspect-ratio:3/4;object-fit:cover;object-position:top;display:block}
+.works-row figcaption{font-size:11px;letter-spacing:.08em;color:var(--sub);padding:10px 14px}
+@media(max-width:820px){.works-row{grid-template-columns:1fr}}
+.spec-list{list-style:none;margin-top:34px;border-top:1px solid var(--line)}
+.spec-list li{display:flex;justify-content:space-between;gap:20px;padding:16px 4px;border-bottom:1px solid var(--line);font-size:13.5px}
+.spec-list li b{font-weight:700;letter-spacing:.04em}
+.spec-list li span{color:var(--sub);text-align:right}
+.tag-cloud{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.tag-cloud span{border:1px solid var(--line);border-radius:999px;padding:8px 18px;font-size:12.5px;font-weight:500;letter-spacing:.05em;color:var(--sub)}
+.cta-line{margin-top:44px;display:inline-flex;align-items:center;gap:16px;font-weight:700;letter-spacing:.08em;font-size:14px;border-bottom:1px solid currentColor;padding-bottom:8px}
+.cta-line::after{content:"→";font-family:var(--en);transition:transform .3s}
+.cta-line:hover::after{transform:translateX(6px)}
+
+/* ===== monster lounge horizontal ===== */
+.lounge{position:relative}
+.lounge-head{padding:clamp(120px,16vh,200px) 0 60px}
+.lounge-track{display:flex;width:max-content}
+.panel{
+  width:100vw;min-height:100svh;flex-shrink:0;
+  display:flex;align-items:center;position:relative;
+}
+.panel .wrap{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(30px,5vw,80px);align-items:center;width:100%}
+@media(max-width:920px){.panel .wrap{grid-template-columns:1fr}}
+.panel .svc-en{font-family:var(--en);font-weight:800;font-size:clamp(54px,8vw,110px);line-height:1;letter-spacing:-.02em;color:transparent;-webkit-text-stroke:1.5px var(--accent);opacity:.85;white-space:nowrap}
+.panel h3{font-family:var(--serif);font-size:clamp(30px,4vw,52px);font-weight:800;margin:18px 0 8px;letter-spacing:.05em}
+.panel .svc-cat{font-size:13px;font-weight:700;letter-spacing:.3em;color:var(--accent)}
+.panel p{color:var(--sub);font-size:clamp(13.5px,1.3vw,15px);max-width:30em;margin-top:14px}
+.panel .photo-slot{aspect-ratio:3/4;max-height:62svh}
+.panel-count{position:absolute;bottom:36px;left:clamp(20px,5vw,64px);font-family:var(--en);font-size:12px;letter-spacing:.25em;color:var(--sub)}
+@media(max-width:920px){
+  .lounge-track{display:block;width:auto}
+  .panel{width:auto;min-height:auto;padding:80px 0}
+  .panel .photo-slot{aspect-ratio:4/3;max-height:none}
+  .panel-count{display:none}
+}
+
+/* ===== print chapter (light) ===== */
+.print-items{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:60px}
+.print-items div{background:var(--bg);transition:background-color 1s;padding:26px 20px;font-size:13px;font-weight:700;letter-spacing:.06em;display:flex;align-items:flex-end;min-height:120px;position:relative}
+.print-items div::before{content:attr(data-en);position:absolute;top:16px;left:20px;font-family:var(--en);font-size:9px;font-weight:600;letter-spacing:.2em;color:var(--accent)}
+@media(max-width:820px){.print-items{grid-template-columns:repeat(2,1fr)}}
+.revolution{
+  margin-top:80px;border:1px solid var(--line);border-radius:8px;
+  padding:clamp(30px,4vw,56px);display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;
+  position:relative;overflow:hidden;
+}
+.revolution::before{content:"AD REVOLUTION";position:absolute;right:-10px;bottom:-26px;font-family:var(--en);font-weight:800;font-size:clamp(50px,7vw,100px);letter-spacing:-.02em;color:transparent;-webkit-text-stroke:1px var(--line);pointer-events:none}
+.revolution h3{font-family:var(--serif);font-size:clamp(24px,3vw,40px);font-weight:800;line-height:1.4;margin-bottom:16px}
+.revolution h3 em{font-style:normal;color:var(--accent)}
+@media(max-width:920px){.revolution{grid-template-columns:1fr}}
+
+/* ===== contact ===== */
+.contact{padding:clamp(140px,20vh,260px) 0 90px;text-align:left}
+.contact .big-tel{font-family:var(--en);font-weight:800;font-size:clamp(38px,7vw,96px);letter-spacing:-.01em;line-height:1.1;display:inline-block;border-bottom:2px solid currentColor;margin:26px 0 8px}
+.contact .hours{color:var(--sub);font-size:13px;letter-spacing:.06em}
+.contact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:80px;padding-top:50px;border-top:1px solid var(--line);font-size:13.5px}
+.contact-grid h4{font-family:var(--en);font-size:10px;letter-spacing:.3em;color:var(--sub);margin-bottom:14px;font-weight:600}
+.contact-grid p{color:var(--sub)}
+.contact-grid p b{color:var(--ink)}
+@media(max-width:820px){.contact-grid{grid-template-columns:1fr}}
+footer{position:relative;z-index:2;padding:30px clamp(20px,5vw,64px);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:11px;color:var(--sub);letter-spacing:.08em;border-top:1px solid var(--line)}
+
+/* reveal helpers */
+.fade-up{opacity:0;transform:translateY(46px)}
+@media (prefers-reduced-motion: reduce){
+  .fade-up{opacity:1!important;transform:none!important}
+  h2.scene-title .line>span,.hero h1 .row>span{transform:none!important}
+  .scroll-cue::after{animation:none}
+}
+</style>
+</head>
+<body data-theme="hero">
+
+<canvas id="paint-canvas"></canvas>
+
+<header class="site-head">
+  <a class="logo" href="#top">M'S PLANNING<small>株式会社エムズプランニング</small></a>
+  <a class="tel" href="tel:0298358884">TEL 029-835-8884</a>
+</header>
+
+<nav class="chapter-rail" aria-label="章ナビゲーション">
+  <a href="#top" data-rail="hero"><span class="dot"></span><b>TOP</b></a>
+  <a href="#prologue" data-rail="prologue"><span class="dot"></span><b>序章</b></a>
+  <a href="#hige" data-rail="hige"><span class="dot"></span><b>壱</b></a>
+  <a href="#lounge" data-rail="lounge"><span class="dot"></span><b>弐</b></a>
+  <a href="#print" data-rail="print"><span class="dot"></span><b>参</b></a>
+  <a href="#garage" data-rail="garage"><span class="dot"></span><b>肆</b></a>
+  <a href="#contact" data-rail="contact"><span class="dot"></span><b>終</b></a>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section class="hero scene" id="top" data-bg="#0D0B12" data-ink="#F4F1EA">
+  <div class="wrap">
+    <p class="hero-kicker">M'S PLANNING Inc. — TSUCHIURA, IBARAKI</p>
+    <h1>
+      <span class="row"><span>土浦から、</span></span>
+      <span class="row"><span><em>色</em>を刷る。</span></span>
+    </h1>
+    <div class="hero-sub">
+      <i style="--dotc:var(--c-red)">広告・印刷デザイン</i>
+      <i style="--dotc:var(--c-pink)">モンスターラウンジ</i>
+      <i style="--dotc:var(--c-blue)">モンスターガレージ</i>
+    </div>
+  </div>
+  <p class="scroll-cue">SCROLL</p>
+</section>
+
+<!-- ============ PROLOGUE ============ -->
+<section class="prologue scene" id="prologue" data-bg="#12101A" data-ink="#F4F1EA">
+  <span class="chapter-no">序</span>
+  <div class="wrap">
+    <p class="eyebrow" style="--accent:var(--c-red)">PROLOGUE — 私たちについて</p>
+    <h2 class="scene-title">
+      <span class="line"><span>刷る、整える、走らせる。</span></span>
+      <span class="line"><span>三つの顔を持つ会社です。</span></span>
+    </h2>
+    <p class="lede">株式会社エムズプランニングは、茨城県土浦市を拠点に、<strong>広告・印刷</strong>、<strong>リラクゼーション＆ビューティー</strong>、<strong>バイク・トライク販売</strong>の三事業を展開しています。地域の商売を盛り上げる紙一枚から、毎日をととのえる一時間まで。茨城を中心に、全国どこからでもご依頼を承ります。</p>
+    <div class="biz-grid">
+      <div class="biz-card" style="--accent:var(--c-red)">
+        <span class="bar"></span>
+        <div><span class="num">BUSINESS 01</span><h3>広告・印刷・デザイン</h3></div>
+        <p>名刺・チラシ・ポスター・のぼり・看板・グッズまで、デザインから印刷・施工までワンストップ。</p>
+      </div>
+      <div class="biz-card" style="--accent:var(--c-pink)">
+        <span class="bar"></span>
+        <div><span class="num">BUSINESS 02</span><h3>モンスターラウンジ</h3></div>
+        <p>脱毛・もみほぐし・痩身エステ・日焼け・酸素ルーム。土浦で「ととのう」を一棟に。</p>
+      </div>
+      <div class="biz-card" style="--accent:var(--c-blue)">
+        <span class="bar"></span>
+        <div><span class="num">BUSINESS 03</span><h3>モンスターガレージ</h3></div>
+        <p>バイク・トライク・自動車の販売。広告宣伝カーの企画運用も手がけています。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CH.1 髭断爵 ============ -->
+<section class="chapter scene" id="hige" data-bg="#101A2E" data-ink="#F2EBDD">
+  <span class="chapter-no">壱</span>
+  <div class="wrap">
+    <p class="eyebrow" style="--accent:var(--c-gold)">CHAPTER 01 — EKINAKA SALON</p>
+    <div class="split">
+      <div>
+        <h2 class="scene-title">
+          <span class="line"><span>駅なか脱毛専門店</span></span>
+          <span class="line"><span>「髭断爵」</span></span>
+        </h2>
+        <p class="lede">2022年6月、<strong>つくばエクスプレス南流山駅</strong>にオープンした男性向け脱毛専門店。改札からすぐ、通勤の前後にさっと立ち寄れる「駅なか」立地が最大の武器です。毎朝の髭剃りという名の労働から、紳士を解放します。</p>
+        <ul class="spec-list">
+          <li><b>店舗</b><span>TX 南流山駅 駅なか</span></li>
+          <li><b>対象</b><span>男性のヒゲ・全身脱毛</span></li>
+          <li><b>特長</b><span>駅直結／短時間施術／通いやすい料金設計</span></li>
+        </ul>
+        <a class="cta-line" href="http://m-s-planning.jp/higedansyaku/" target="_blank" rel="noopener">髭断爵の詳細を見る</a>
+      </div>
+      <div class="photo-slot" data-label="PHOTO：駅なか脱毛専門店 髭断爵" style="--ph-bg:linear-gradient(140deg,#1b2c4d 0%,#0e1830 60%,#2a2010 100%)">
+        <img class="ph" src="http://m-s-planning.jp/files/libs/1692/202410140824327662.jpg" alt="駅なか脱毛専門店 髭断爵" loading="lazy" onerror="this.style.display='none'">
+        <svg class="art" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="300" fill="none"/>
+          <circle cx="310" cy="80" r="120" fill="#C9A24B" opacity=".12"/>
+          <path d="M60 230 Q120 140 200 160 T360 120" stroke="#C9A24B" stroke-width="2" fill="none" opacity=".5"/>
+          <text x="40" y="160" font-family="Georgia,serif" font-size="64" fill="#C9A24B" opacity=".85">髭</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CH.2 MONSTER LOUNGE ============ -->
+<section class="lounge scene" id="lounge" data-bg="#231126" data-ink="#FBF4F6">
+  <span class="chapter-no" style="top:60px">弐</span>
+  <div class="wrap lounge-head">
+    <p class="eyebrow" style="--accent:var(--c-pink)">CHAPTER 02 — MONSTER LOUNGE</p>
+    <h2 class="scene-title">
+      <span class="line"><span>土浦の「ととのう」が、</span></span>
+      <span class="line"><span>ここに全部ある。</span></span>
+    </h2>
+    <p class="lede">モンスターラウンジは、脱毛から酸素ルームまで5つのメニューを備えた複合サロン。横にスクロールして、5つの部屋をのぞいてみてください。</p>
+  </div>
+
+  <div class="lounge-pin">
+    <div class="lounge-track">
+
+      <article class="panel" data-color="#152433" style="--accent:var(--c-blue)">
+        <div class="wrap">
+          <div>
+            <p class="svc-en">NUKETORU</p>
+            <p class="svc-cat">脱毛サロン</p>
+            <h3>ぬけとる</h3>
+            <p>ムダ毛の悩みを根こそぎ。男女問わず通える脱毛サロン。はじめての方向けの脱毛体験も実施中です。</p>
+          </div>
+          <div class="photo-slot" data-label="PHOTO：脱毛サロン ぬけとる" style="--ph-bg:linear-gradient(160deg,#1b3c55,#0f2233)">
+            <img class="ph" src="http://m-s-planning.jp/files/libs/1132/202106111455537997.jpg" alt="脱毛サロン ぬけとる 店内" loading="lazy" onerror="this.style.display='none'">
+            <svg class="art" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><circle cx="220" cy="90" r="130" fill="#4FB3E8" opacity=".16"/><path d="M30 320 Q150 240 270 300" stroke="#4FB3E8" stroke-width="2" fill="none" opacity=".5"/></svg>
+          </div>
+        </div>
+        <p class="panel-count">01 / 05</p>
+      </article>
+
+      <article class="panel" data-color="#14301f" style="--accent:var(--c-green)">
+        <div class="wrap">
+          <div>
+            <p class="svc-en">KORITORU</p>
+            <p class="svc-cat">もみほぐし・足つぼ</p>
+            <h3>こりとる</h3>
+            <p>肩も腰も足裏も、頑固なコリをじっくりほぐす。仕事帰りの一時間で、身体が軽くなる感覚を。</p>
+          </div>
+          <div class="photo-slot" data-label="PHOTO：もみほぐし・足つぼ こりとる" style="--ph-bg:linear-gradient(160deg,#1d4a30,#0e2417)">
+            <img class="ph" src="http://m-s-planning.jp/files/libs/1125/202107151806131272.jpg" alt="もみほぐし こりとる" loading="lazy" onerror="this.style.display='none'">
+            <svg class="art" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><circle cx="80" cy="320" r="140" fill="#2EAF7D" opacity=".15"/><path d="M40 120 Q150 200 260 110" stroke="#2EAF7D" stroke-width="2" fill="none" opacity=".5"/></svg>
+          </div>
+        </div>
+        <p class="panel-count">02 / 05</p>
+      </article>
+
+      <article class="panel" data-color="#3a1525" style="--accent:var(--c-pink)">
+        <div class="wrap">
+          <div>
+            <p class="svc-en">YASETORU</p>
+            <p class="svc-cat">痩身エステ</p>
+            <h3>やせとる</h3>
+            <p>気になる部分を集中ケアする痩身エステ。理想のラインへ、無理なく続けられるプランをご提案します。</p>
+          </div>
+          <div class="photo-slot" data-label="PHOTO：痩身エステ やせとる" style="--ph-bg:linear-gradient(160deg,#55203a,#2a0f1d)">
+            <img class="ph" src="http://m-s-planning.jp/files/libs/1229/202203191201567063.jpg" alt="痩身エステ やせとる" loading="lazy" onerror="this.style.display='none'">
+            <svg class="art" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><circle cx="230" cy="300" r="130" fill="#E85D8A" opacity=".16"/><path d="M40 100 Q160 60 260 160" stroke="#E85D8A" stroke-width="2" fill="none" opacity=".5"/></svg>
+          </div>
+        </div>
+        <p class="panel-count">03 / 05</p>
+      </article>
+
+      <article class="panel" data-color="#3a2410" style="--accent:var(--c-sun)">
+        <div class="wrap">
+          <div>
+            <p class="svc-en">YAKETORU</p>
+            <p class="svc-cat">日焼けサロン</p>
+            <h3>やけとる</h3>
+            <p>季節を問わず、健康的な小麦色へ。マシンを完備した日焼けサロンで、理想のトーンを手に入れる。</p>
+          </div>
+          <div class="photo-slot" data-label="PHOTO：日焼けサロン やけとる" style="--ph-bg:linear-gradient(160deg,#5a3a14,#2a1a08)">
+            <img class="ph" src="http://m-s-planning.jp/files/libs/1716/202507191639528033.jpg" alt="日焼けサロン やけとる" loading="lazy" onerror="this.style.display='none'">
+            <svg class="art" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><circle cx="150" cy="120" r="110" fill="#F08C2E" opacity=".2"/><path d="M30 300 Q150 360 270 290" stroke="#F08C2E" stroke-width="2" fill="none" opacity=".5"/></svg>
+          </div>
+        </div>
+        <p class="panel-count">04 / 05</p>
+      </article>
+
+      <article class="panel" data-color="#0f2e33" style="--accent:var(--c-cyan)">
+        <div class="wrap">
+          <div>
+            <p class="svc-en">O2 ROOM</p>
+            <p class="svc-cat">高気圧酸素</p>
+            <h3>酸素ルーム</h3>
+            <p>高気圧の酸素ルームで、疲労回復・リフレッシュを。スポーツ後のケアや集中力アップにも。</p>
+          </div>
+          <div class="photo-slot" data-label="PHOTO：高気圧酸素ルーム" style="--ph-bg:linear-gradient(160deg,#15454d,#0a2227)">
+            <img class="ph" src="http://m-s-planning.jp/files/libs/946/20210415190637733.jpg" alt="高気圧酸素ルーム" loading="lazy" onerror="this.style.display='none'">
+            <svg class="art" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><circle cx="90" cy="110" r="100" fill="#5CC8D8" opacity=".18"/><circle cx="220" cy="290" r="70" fill="#5CC8D8" opacity=".12"/></svg>
+          </div>
+        </div>
+        <p class="panel-count">05 / 05</p>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ CH.3 PRINT (LIGHT) ============ -->
+<section class="chapter scene" id="print" data-bg="#F4F1EA" data-ink="#191515">
+  <span class="chapter-no">参</span>
+  <div class="wrap">
+    <p class="eyebrow" style="--accent:var(--c-red)">CHAPTER 03 — DESIGN &amp; PRINT</p>
+    <h2 class="scene-title">
+      <span class="line"><span>紙の上の一勝負、</span></span>
+      <span class="line"><span>デザインから刷りまで。</span></span>
+    </h2>
+    <p class="lede">エムズプランニングの原点は広告・印刷。パチンコ店チラシで鍛えた<strong>「目を奪うデザイン」</strong>と、小回りの利く対応力で、商売の現場で結果を出す販促物をつくります。デザイン・印刷・看板施工・グッズ製作までワンストップです。</p>
+    <div class="print-items">
+      <div data-en="CARD">名刺・ポイントカード</div>
+      <div data-en="FLYER">折込チラシ・フライヤー</div>
+      <div data-en="DM">各種DM・チケット</div>
+      <div data-en="POSTER">ポスター・封筒・伝票</div>
+      <div data-en="BANNER">のぼり・懸垂幕</div>
+      <div data-en="SIGN">オリジナル看板</div>
+      <div data-en="GOODS">Tシャツ・オリジナルグッズ</div>
+    </div>
+    <div class="works-row">
+      <figure>
+        <img src="http://m-s-planning.jp/files/libs/579/201903110949274877.jpg" alt="折込チラシ制作実績" loading="lazy" onerror="this.parentElement.style.display='none'">
+        <figcaption>WORKS — 自動車ディーラー様 折込チラシ</figcaption>
+      </figure>
+      <figure>
+        <img src="http://m-s-planning.jp/files/libs/581/201903110950165423.gif" alt="祭ポスター制作実績" loading="lazy" onerror="this.parentElement.style.display='none'">
+        <figcaption>WORKS — 祭ポスター</figcaption>
+      </figure>
+      <figure>
+        <img src="http://m-s-planning.jp/files/libs/582/201903110950466101.gif" alt="二つ折パンフレット制作実績" loading="lazy" onerror="this.parentElement.style.display='none'">
+        <figcaption>WORKS — A4二つ折パンフレット 中面</figcaption>
+      </figure>
+    </div>
+    <div class="revolution" style="--accent:var(--c-red)">
+      <div>
+        <p class="eyebrow" style="--accent:var(--c-red);margin-bottom:14px">JAPAN'S FIRST</p>
+        <h3>日本初、走る広告。<br><em>広告宣伝カー</em>という選択。</h3>
+        <p class="lede" style="font-size:14px">3輪バイク（トライク）が街を走り、広告を「待つ」から「届けに行く」へ。折込チラシと組み合わせれば、地域への刷り込み効果は倍増します。</p>
+      </div>
+      <div class="photo-slot" data-label="WORKS：トライクショップカード制作実績" style="--ph-bg:linear-gradient(140deg,#e8ddc8,#d8c9a8);aspect-ratio:4/3">
+        <img class="ph" src="http://m-s-planning.jp/files/libs/578/201903110948579126.jpg" alt="トライク関連のショップカード制作実績" loading="lazy" onerror="this.style.display='none'">
+        <svg class="art" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><path d="M40 220 H360" stroke="#D8402E" stroke-width="3" opacity=".6"/><circle cx="120" cy="220" r="34" fill="none" stroke="#191515" stroke-width="4" opacity=".7"/><circle cx="280" cy="220" r="34" fill="none" stroke="#191515" stroke-width="4" opacity=".7"/><rect x="150" y="120" width="120" height="70" rx="6" fill="#D8402E" opacity=".85"/><text x="163" y="165" font-family="sans-serif" font-weight="bold" font-size="22" fill="#fff">AD CAR</text></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CH.4 GARAGE ============ -->
+<section class="chapter scene" id="garage" data-bg="#141414" data-ink="#EDEDED">
+  <span class="chapter-no">肆</span>
+  <div class="wrap">
+    <p class="eyebrow" style="--accent:var(--c-blue)">CHAPTER 04 — MONSTER GARAGE</p>
+    <div class="split">
+      <div class="photo-slot" data-label="PHOTO：在庫車両・トライク（元サイトに素材なし／要撮影）" style="--ph-bg:linear-gradient(150deg,#26303d,#101418)">
+        <svg class="art" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><path d="M30 240 H370" stroke="#4FB3E8" stroke-width="2" opacity=".5"/><circle cx="130" cy="238" r="40" fill="none" stroke="#EDEDED" stroke-width="5" opacity=".7"/><circle cx="300" cy="238" r="40" fill="none" stroke="#EDEDED" stroke-width="5" opacity=".7"/><path d="M110 200 Q200 130 320 195" stroke="#4FB3E8" stroke-width="4" fill="none" opacity=".8"/></svg>
+      </div>
+      <div>
+        <h2 class="scene-title">
+          <span class="line"><span>週末の相棒は、</span></span>
+          <span class="line"><span>三輪でも四輪でも。</span></span>
+        </h2>
+        <p class="lede">モンスターガレージでは、<strong>バイク・トライク・自動車</strong>の販売を行っています。広告宣伝カーの運用で培ったトライクの知見は地域随一。乗り出しのご相談から、お気軽にどうぞ。</p>
+        <div class="tag-cloud">
+          <span>バイク販売</span><span>トライク販売</span><span>自動車販売</span><span>ご相談無料</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL / CONTACT ============ -->
+<section class="contact scene" id="contact" data-bg="#0D0B12" data-ink="#F4F1EA">
+  <span class="chapter-no">終</span>
+  <div class="wrap">
+    <p class="eyebrow" style="--accent:var(--c-red)">FINAL CHAPTER — CONTACT</p>
+    <h2 class="scene-title">
+      <span class="line"><span>さて、次は</span></span>
+      <span class="line"><span>あなたの番です。</span></span>
+    </h2>
+    <p class="lede">チラシ一枚のご相談から、サロンのご予約、トライクの試乗まで。お電話・メールでお気軽にご連絡ください。茨城県を中心に、印刷物は全国対応です。</p>
+    <a class="big-tel" href="tel:0298358884">029-835-8884</a>
+    <p class="hours">FAX 029-835-8894 ／ MAIL info@m-s-planning.jp</p>
+    <div class="contact-grid">
+      <div>
+        <h4>COMPANY</h4>
+        <p><b>株式会社エムズプランニング</b><br>〒300-0805<br>茨城県土浦市宍塚1786-1</p>
+      </div>
+      <div>
+        <h4>BUSINESS</h4>
+        <p>1. 広告・印刷・デザイン<br>2. モンスターラウンジ（脱毛・もみほぐし・痩身・日焼け・酸素ルーム）<br>3. モンスターガレージ（バイク・トライク・自動車販売）</p>
+      </div>
+      <div>
+        <h4>LINKS</h4>
+        <p><a href="http://m-s-planning.jp/higedansyaku/" target="_blank" rel="noopener">駅なか脱毛専門店 髭断爵 →</a><br><a href="http://m-s-planning.jp/monsterlounge/" target="_blank" rel="noopener">モンスターラウンジ →</a><br><a href="http://m-s-planning.jp/publics/index/61/" target="_blank" rel="noopener">広告・印刷の実績 →</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>Copyright © 株式会社エムズプランニング All Rights Reserved.</span>
+  <span>TSUCHIURA, IBARAKI — SINCE THE INK FIRST DRIED.</span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lenis/1.1.14/lenis.min.js"></script>
+<script>
+(function(){
+  "use strict";
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  gsap.registerPlugin(ScrollTrigger);
+
+  /* ---------- Lenis smooth scroll ---------- */
+  let lenis = null;
+  if (!reduceMotion && typeof Lenis !== "undefined") {
+    lenis = new Lenis({ lerp: 0.085, smoothWheel: true });
+    lenis.on("scroll", ScrollTrigger.update);
+    gsap.ticker.add((time) => lenis.raf(time * 1000));
+    gsap.ticker.lagSmoothing(0);
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener("click", e => {
+        const id = a.getAttribute("href");
+        if (id.length > 1 && document.querySelector(id)) {
+          e.preventDefault();
+          lenis.scrollTo(id, { offset: 0, duration: 1.6 });
+        }
+      });
+    });
+  }
+
+  /* ---------- Three.js paint background ---------- */
+  const canvas = document.getElementById("paint-canvas");
+  let renderer = null;
+  try { renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true }); } catch(e) {}
+  if (renderer && !reduceMotion) {
+    const DPR = Math.min(window.devicePixelRatio || 1, 1.5);
+    renderer.setPixelRatio(DPR);
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const MAX_PTS = 22;
+    const points = [];
+    for (let i = 0; i < MAX_PTS; i++) points.push(new THREE.Vector4(-9999, -9999, 1, i));
+    const uniforms = {
+      uTime:   { value: 0 },
+      uRes:    { value: new THREE.Vector2(1, 1) },
+      uPoints: { value: points },
+      uFade:   { value: 1 }
+    };
+    const frag = `
+      precision highp float;
+      uniform float uTime;
+      uniform vec2 uRes;
+      uniform vec4 uPoints[${"22"}];
+      uniform float uFade;
+      float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
+      float noise(vec2 p){
+        vec2 i = floor(p); vec2 f = fract(p);
+        f = f * f * (3.0 - 2.0 * f);
+        float a = hash(i);
+        float b = hash(i + vec2(1.0, 0.0));
+        float c = hash(i + vec2(0.0, 1.0));
+        float d = hash(i + vec2(1.0, 1.0));
+        return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+      }
+      float fbm(vec2 p){
+        float v = 0.0; float a = 0.5;
+        for (int k = 0; k < 4; k++){ v += a * noise(p); p *= 2.1; a *= 0.5; }
+        return v;
+      }
+      vec3 palette(float i){
+        if (i < 0.5) return vec3(0.847, 0.251, 0.180);   // red
+        if (i < 1.5) return vec3(0.310, 0.702, 0.910);   // blue
+        if (i < 2.5) return vec3(0.910, 0.365, 0.541);   // pink
+        if (i < 3.5) return vec3(0.941, 0.549, 0.180);   // sun
+        if (i < 4.5) return vec3(0.180, 0.686, 0.490);   // green
+        return vec3(0.788, 0.635, 0.294);                // gold
+      }
+      void main(){
+        vec2 uv = gl_FragCoord.xy;
+        vec3 col = vec3(0.0);
+        float grain = (hash(uv * 0.7 + uTime) - 0.5) * 0.035;
+        for (int j = 0; j < 22; j++){
+          vec4 p = uPoints[j];
+          float age = clamp(p.z, 0.0, 1.0);
+          if (age >= 1.0) continue;
+          vec2 d2 = uv - p.xy;
+          float warp = fbm(uv * 0.012 + p.w * 3.7) - 0.5;
+          float d = length(d2) + warp * 90.0;
+          float radius = mix(150.0, 30.0, age) * (uRes.x / 1400.0 + 0.45);
+          float blob = smoothstep(radius, radius * 0.15, d) * (1.0 - age);
+          vec3 c = palette(mod(p.w, 6.0));
+          col += c * blob * 0.85;
+        }
+        // wet sheen
+        float sheen = fbm(uv * 0.004 + uTime * 0.03) * 0.05;
+        col = col / (1.0 + col);          // soft tone map
+        col += vec3(sheen) * step(0.02, col.r + col.g + col.b);
+        col += grain;
+        float alpha = clamp(max(col.r, max(col.g, col.b)) * 1.4, 0.0, 0.92) * uFade;
+        gl_FragColor = vec4(col, alpha);
+      }
+    `;
+    const mat = new THREE.ShaderMaterial({
+      fragmentShader: frag,
+      uniforms: uniforms,
+      transparent: true,
+      depthTest: false
+    });
+    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat));
+
+    function resize(){
+      const w = window.innerWidth, h = window.innerHeight;
+      renderer.setSize(w, h, false);
+      uniforms.uRes.value.set(w * DPR, h * DPR);
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    let head = 0, idx = 0, lastX = -1, lastY = -1;
+    function stamp(x, y){
+      const p = points[head];
+      p.set(x * DPR, (window.innerHeight - y) * DPR, 0, idx++);
+      head = (head + 1) % MAX_PTS;
+    }
+    window.addEventListener("pointermove", e => {
+      if (Math.hypot(e.clientX - lastX, e.clientY - lastY) > 24){
+        stamp(e.clientX, e.clientY);
+        lastX = e.clientX; lastY = e.clientY;
+      }
+    }, { passive: true });
+    window.addEventListener("touchmove", e => {
+      const t = e.touches[0];
+      if (t && Math.hypot(t.clientX - lastX, t.clientY - lastY) > 24){
+        stamp(t.clientX, t.clientY);
+        lastX = t.clientX; lastY = t.clientY;
+      }
+    }, { passive: true });
+
+    // idle drifting blobs (so mobile / 初見でも絵になる)
+    let idleT = 0;
+    const clock = new THREE.Clock();
+    function tick(){
+      const dt = clock.getDelta();
+      uniforms.uTime.value += dt;
+      idleT += dt;
+      if (idleT > 1.1){
+        idleT = 0;
+        const w = window.innerWidth, h = window.innerHeight;
+        stamp(w * (0.2 + 0.6 * Math.random()), h * (0.25 + 0.5 * Math.random()));
+      }
+      for (let i = 0; i < MAX_PTS; i++){
+        if (points[i].z < 1) points[i].z = Math.min(1, points[i].z + dt * 0.22);
+      }
+      renderer.render(scene, camera);
+      requestAnimationFrame(tick);
+    }
+    tick();
+
+    // ヒーローを過ぎたらペイントを薄く（消さずに余韻を残す）
+    gsap.to(uniforms.uFade, {
+      value: 0.16, ease: "none",
+      scrollTrigger: { trigger: "#prologue", start: "top 90%", end: "top 20%", scrub: true }
+    });
+  } else if (canvas) {
+    canvas.style.display = "none";
+  }
+
+  /* ---------- 章ごとのカラートランジション ---------- */
+  const body = document.body;
+  document.querySelectorAll("section.scene").forEach(sec => {
+    const bg = sec.dataset.bg, ink = sec.dataset.ink;
+    ScrollTrigger.create({
+      trigger: sec,
+      start: "top 55%",
+      end: "bottom 55%",
+      onToggle(self){
+        if (self.isActive){
+          body.style.backgroundColor = bg;
+          body.style.color = ink;
+          body.style.setProperty("--ink", ink);
+          body.style.setProperty("--sub", ink + "A0");
+          body.style.setProperty("--line", ink + "2B");
+          body.style.setProperty("--bg", bg);
+          document.querySelectorAll(".biz-card,.print-items div").forEach(el => el.style.backgroundColor = bg);
+          const id = sec.id === "top" ? "hero" : sec.id;
+          document.querySelectorAll(".chapter-rail a").forEach(a =>
+            a.classList.toggle("active", a.dataset.rail === id || (id === "hero" && a.dataset.rail === "hero")));
+        }
+      }
+    });
+  });
+
+  /* ---------- ヒーロー：行ごとのシネマティック・リビール ---------- */
+  if (!reduceMotion){
+    gsap.timeline({ delay: 0.25 })
+      .to(".hero h1 .row > span", { y: 0, duration: 1.3, ease: "power4.out", stagger: 0.14 })
+      .from(".hero-kicker", { opacity: 0, y: 14, duration: 0.8 }, "-=1.0")
+      .from(".hero-sub i", { opacity: 0, y: 16, stagger: 0.1, duration: 0.7 }, "-=0.8")
+      .from(".scroll-cue", { opacity: 0, duration: 0.8 }, "-=0.4");
+
+    /* 各章タイトル：マスクから一行ずつ立ち上がる */
+    document.querySelectorAll("h2.scene-title").forEach(t => {
+      gsap.to(t.querySelectorAll(".line > span"), {
+        y: 0, duration: 1.1, ease: "power4.out", stagger: 0.12,
+        scrollTrigger: { trigger: t, start: "top 78%" }
+      });
+    });
+
+    /* 汎用リビール */
+    document.querySelectorAll(".lede,.spec-list,.tag-cloud,.cta-line,.revolution,.print-items,.contact .big-tel,.contact-grid,.eyebrow").forEach(el => {
+      gsap.fromTo(el, { opacity: 0, y: 46 }, {
+        opacity: 1, y: 0, duration: 1.1, ease: "power3.out",
+        scrollTrigger: { trigger: el, start: "top 85%" }
+      });
+    });
+
+    /* 事業カード：バーが伸びてから本体が浮く */
+    gsap.utils.toArray(".biz-card").forEach((card, i) => {
+      const tl = gsap.timeline({ scrollTrigger: { trigger: card, start: "top 85%" } });
+      tl.fromTo(card, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out", delay: i * 0.12 })
+        .to(card.querySelector(".bar"), { scaleX: 1, duration: 0.7, ease: "power2.out" }, "-=0.4");
+    });
+
+    /* 写真スロット：パララックス＋ケンバーンズ風 */
+    gsap.utils.toArray(".chapter .photo-slot, .revolution .photo-slot").forEach(ph => {
+      gsap.fromTo(ph, { y: 60, scale: 1.04 }, {
+        y: -40, scale: 1, ease: "none",
+        scrollTrigger: { trigger: ph, start: "top bottom", end: "bottom top", scrub: true }
+      });
+    });
+
+    /* 章番号（漢数字）はゆっくり逆方向へ */
+    gsap.utils.toArray(".chapter-no").forEach(n => {
+      gsap.fromTo(n, { y: 0 }, {
+        y: 120, ease: "none",
+        scrollTrigger: { trigger: n.parentElement, start: "top bottom", end: "bottom top", scrub: true }
+      });
+    });
+  } else {
+    document.querySelectorAll("h2.scene-title .line > span, .hero h1 .row > span").forEach(s => s.style.transform = "none");
+  }
+
+  /* ---------- モンスターラウンジ：横スクロールの映画シーン ---------- */
+  const mm = gsap.matchMedia();
+  mm.add("(min-width: 921px)", () => {
+    const track = document.querySelector(".lounge-track");
+    const panels = gsap.utils.toArray(".panel");
+    const total = panels.length;
+    const scrollTween = gsap.to(track, {
+      x: () => -(track.scrollWidth - window.innerWidth),
+      ease: "none",
+      scrollTrigger: {
+        trigger: ".lounge-pin",
+        pin: true,
+        scrub: 0.6,
+        end: () => "+=" + (track.scrollWidth - window.innerWidth),
+        invalidateOnRefresh: true,
+        onUpdate(self){
+          // パネル進行に合わせて背景色をクロスフェード
+          const seg = self.progress * (total - 1);
+          const a = Math.floor(seg), b = Math.min(a + 1, total - 1);
+          const mix = gsap.utils.interpolate(panels[a].dataset.color, panels[b].dataset.color)(seg - a);
+          body.style.backgroundColor = mix;
+        }
+      }
+    });
+    panels.forEach(panel => {
+      const inner = panel.querySelectorAll(".svc-en, h3, .svc-cat, p, .photo-slot");
+      gsap.fromTo(inner, { opacity: 0.2, x: 90 }, {
+        opacity: 1, x: 0, stagger: 0.06, ease: "power2.out",
+        scrollTrigger: {
+          trigger: panel, containerAnimation: scrollTween,
+          start: "left 70%", end: "left 30%", scrub: true
+        }
+      });
+    });
+    return () => {};
+  });
+  mm.add("(max-width: 920px)", () => {
+    // モバイルは縦積み：各パネル接近で背景色だけ切替
+    gsap.utils.toArray(".panel").forEach(panel => {
+      ScrollTrigger.create({
+        trigger: panel, start: "top 55%", end: "bottom 55%",
+        onToggle(self){ if (self.isActive) body.style.backgroundColor = panel.dataset.color; }
+      });
+      if (!reduceMotion){
+        gsap.fromTo(panel.querySelectorAll(".svc-en, h3, .svc-cat, p, .photo-slot"),
+          { opacity: 0, y: 40 },
+          { opacity: 1, y: 0, stagger: 0.07, duration: 0.9,
+            scrollTrigger: { trigger: panel, start: "top 80%" } });
+      }
+    });
+  });
+
+  window.addEventListener("load", () => ScrollTrigger.refresh());
+})();
+</script>
+</body>
+</html>
